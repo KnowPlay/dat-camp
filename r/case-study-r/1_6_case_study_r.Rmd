@@ -1,19 +1,12 @@
 ---
 title: "Case Study: Exploratory Data Analysis in R"
-output: rmarkdown::github_document
+output: html_document
 date: "2023-01-13"
 author: "Created & knitted by [SL](https://github.com/procrasprincess) in `RStudio`"
 ---
 
-```{}
-r setup, include=FALSE
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-```
-
-```{r, echo = FALSE}
-knitr::opts_chunk$set(
-  fig.path = "README_figs/README-"
-)
 ```
 
 ## Part 1. Data cleaning and summarizing with dplyr
