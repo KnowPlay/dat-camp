@@ -1,0 +1,444 @@
+---
+title: "Intro to Importing Data in R"
+output: html_document
+date: "2023-01-10"
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## PART 1. Importing data from flat files with utils
+
+### Introduction & Read.csv
+```{}
+Video
+```
+
+### read.csv
+
+```{}
+The utils package, which is automatically loaded in your R session on startup, can import CSV files with the read.csv() function.
+
+In this exercise, you'll be working with swimming_pools.csv (view); it contains data on swimming pools in Brisbane, Australia (Source: data.gov.au). The file contains the column names in the first row. It uses a comma to separate values within rows.
+
+Type dir() in the console to list the files in your working directory. You'll see that it contains swimming_pools.csv, so you can start straight away.
+```
+
+```{}
+# Import swimming_pools.csv: pools
+pools <- read.csv("swimming_pools.csv")
+
+# Print the structure of pools
+str(pools)
+```
+
+### stringsAsFactors
+
+With stringsAsFactors, you can tell R whether it should convert strings in the flat file to factors.
+
+For all importing functions in the utils package, this argument is TRUE, which means that you import strings as factors. This only makes sense if the strings you import represent categorical variables in R. If you set stringsAsFactors to FALSE, the data frame columns corresponding to strings in your text file will be character.
+
+You'll again be working with the swimming_pools.csv (view) file. It contains two columns (Name and Address), which shouldn't be factors.
+
+```{}
+# Import swimming_pools.csv correctly: pools
+pools <- read.csv("swimming_pools.csv", stringsAsFactors = FALSE)
+
+# Check the structure of pools
+str(pools)
+```
+
+### Any changes?
+
+```{}
+Consider the code below that loads data from swimming_pools.csv in two distinct ways:
+
+Option A
+pools <- read.csv("swimming_pools.csv", stringsAsFactors = TRUE)
+
+Option B
+pools <- read.csv("swimming_pools.csv", stringsAsFactors = FALSE)
+How many variables in the resulting pools data frame have different types if you specify the stringsAsFactors argument differently?
+
+The swimming_pools.csv (view) file is available in your current working directory so you can experiment in the console.
+
+{Any changes}
+# two variables
+Name
+Address
+```
+
+### read.delim & read.table
+
+
+## PART 2. readr & data.table
+
+
+## PART 3. Importing Excel data
+
+### 1. readxl (1)
+
+### 2. List the sheets of an Excel file
+
+```{}
+# Load the readxl package
+library(readxl)
+
+# Print the names of all worksheets
+excel_sheets("urbanpop.xlsx")
+```
+
+### 3. Import an Excel sheet
+
+```{}
+# The readxl package is already loaded
+
+# Read the sheets, one by one
+pop_1 <- read_excel("urbanpop.xlsx", sheet = 1)
+pop_2 <- read_excel("urbanpop.xlsx", sheet = 2)
+pop_3 <- read_excel("urbanpop.xlsx", sheet = 3)
+
+# Put pop_1, pop_2 and pop_3 in a list: pop_list
+pop_list <- list(pop_1, pop_2, pop_3)
+
+# Display the structure of pop_list
+str(pop_list)
+```
+
+### 4. Reading a workbook
+
+```{}
+# The readxl package is already loaded
+
+# Read all Excel sheets with lapply(): pop_list
+pop_list <- lapply(excel_sheets("urbanpop.xlsx"),
+                      read_excel,
+                      path = "urbanpop.xlsx"
+                  )
+
+# Display the structure of pop_list
+str(pop_list)
+```
+
+### 5. readxl (2)
+
+```{}
+1. readxl (2)
+Next to the path and sheet arguments that we discussed in the previous video,
+
+2. read_excel()
+there are also other arguments you can specify. Have a look at the usage of the read_excel function as it appears in the documentation; can you tell the meaning of these arguments? path and sheets have no secrets for you anymore.
+
+3. read_excel() - col_names
+Then, there's col_names, which can be three things: TRUE, the default, which means what the first row of the Excel sheet contains the column names. It can also be FALSE, in which case R comes up with its own names. Finally, you can also set it a character vector specifying the column names. Excel can contain different data types, such as text, numerics and dates. How this converts to R classes is controlled in the col_types argument:
+
+4. read_excel() - col_types
+By default it is NULL, which has R guess the data types of the different columns. But you can also manually specify the col_types. Suppose you want to import all the columns of the first sheet as text. This command will do the trick: The column classes we can see in the printout reveal that indeed, the pop_data variable contains two columns that two are character now, perfect. Other keywords to enforce a type are "numeric", "date" and "blank". "numeric" and "date" are straightforward, but what about "blank"?
+
+5. read_excel() - col_types
+Well, if you use blank, you're simply ignoring that column. If we adapt the previous call like this: You'll see that the population column is missing. This "blank" keyword can come in handy when you have an Excel file with a lot of columns and you only need some of them in R.
+
+6. read_excel() - skip
+Next, there's the skip argument. It specifies the number of rows in your excel sheet R has to skip before actually importing the data. Let's say the first two rows in the first sheet of cities-dot-xlsx are not necessary for our analysis. To ignore them, we can simply set the skip argument to 2 and read_excel will not import these lines. we'll also have to set the col_names argument, because the first row with the column names is skipped as well. if we try out this code, indeed 2 rows were skipped: the row containing the column names and the first observations. That leaves us with the last three observations. In readr, there was also the n_max argument, to specify the number of records to read. Currently this functionality is not available in readxl, but this might be added in the future. The package is still under development as we speak.
+
+7. Wrap-up
+Actually, the excel_sheets and read_excel are the only functions that are available in the readxl package. These two functions and the customization possibilities are all you need to get started with your excel data in R. On top of all that, readxl is extremely fast. You might have recognized many of the arguments of the readr package of the previous chapter. Hadley Wickham made reading data from different data sources pretty consistent. This can only make your job of importing data easier, right?
+
+```
+
+### 6. The col_names argument
+
+```{}
+# The readxl package is already loaded
+
+# Import the first Excel sheet of urbanpop_nonames.xlsx (R gives names): pop_a
+pop_a <- read_excel("urbanpop_nonames.xlsx", col_names = FALSE)
+
+# Import the first Excel sheet of urbanpop_nonames.xlsx (specify col_names): pop_b
+cols <- c("country", paste0("year_", 1960:1966))
+pop_b <- read_excel("urbanpop_nonames.xlsx", col_names = FALSE)
+
+# Print the summary of pop_a
+summary(pop_a)
+
+```
+
+### 7. The skip argument
+
+```{}
+# The readxl package is already loaded
+
+# Import the second sheet of urbanpop.xlsx, skipping the first 21 rows: urbanpop_sel
+urbanpop_sel <- read_excel("urbanpop.xlsx", sheet = 2, col_names = FALSE, skip = 21)
+
+# Print out the first observation from urbanpop_sel
+urbanpop_sel[1,]
+```
+
+### 8. gdata
+
+```{}
+1. gdata
+Before, I introduced the readxl package, which is a very efficient package to import data from excel to R. But there are of course alternatives to readxl. In this video, I'll be discussing one of those alternatives:
+
+2. gdata
+the gdata package, currently maintained by Gregory Warnes. Actually, the gdata package is an entire suite of tools for performing data manipulation in all sorts of fields. It kind of supercharges your basic R distribution to make handling your data less painful. Among these tools, there is also a function that allows you to import Excel data: read dot xls. Out of the box, gdata can only handle the xls format, but you can easily install a driver to support the newer xlsx format as well. There's no function to list the different sheets in an excel file, like excel_sheets in readxl.
+
+3. gdata
+To import data from Excel, gdata uses Perl, another interpreted programming language. The Perl code converts the data in the excel sheet to a csv file.
+
+4. gdata
+Next, this csv file is read into R using the default read-dot-csv function from the utils package.
+
+5. gdata
+read-dot-csv itself is a wrapper around read-dot-table, remember?
+
+6. gdata
+This function can be customized in millions of ways; there are more than 15 arguments you can specify. All these read-dot-table arguments are also available for gdata read-dot-xls function. In this respect, the read-dot-xls function is an extension of the data input functions from the utils package to Excel files. This makes it easy to use for people who are familiar with the import functions of the utils package and their arguments. On the other hand, first converting an entire xls file to a csv file, to next import it into R with the slow read dot csv function is extremely inefficient. What if you're dealing with huge Excel files? You'd have to convert the entire file, and then read it. That's quite some extra work you're doing. Wickham's readxl package is way faster here. So why use gdata in the first place then? Well, we believe that readxl will become the standard package to import Excel data. However, as we speak, the readxl package is still under development: the version we're working with is pre-V1. If you don't want to rely on packages that are still under heavy development and whose syntax can still change, you can stick to more established packages like gdata. Now, let's get practical. Still remember the cities dot xlsx file?
+
+7. cities.xls
+Here it is as a xls file this time, cities dot xls. Two sheets, containing the population of some capitals in 1990 and 2000.
+
+8. read.xls()
+Let's first install and load gdata, and then try gdata's read-dot-xls function to import the excel data. As before, the first argument you pass it is the path to the file; in our case, cities-dot-xls is still in the working directory. If your Excel file contains multiple sheets, only the first sheet is imported. You can again choose to specify a different sheet by sheet number or by sheet name, like this example.
+```
+
+### 9. Import a local file
+
+```{}
+# Load the gdata package
+library(gdata)
+
+# Import the second sheet of urbanpop.xls: urban_pop
+urban_pop <- read.xls("urbanpop.xls", sheet = "1967-1974")
+
+# Print the first 11 observations using head()
+head(urban_pop, n = 11)
+```
+
+### 10. read.xls() wraps around read.table()
+
+```{}
+# The gdata package is alreaded loaded
+
+# Column names for urban_pop
+columns <- c("country", paste0("year_", 1967:1974))
+
+# Finish the read.xls call
+urban_pop <- read.xls("urbanpop.xls", sheet = 2,
+                      skip = 50, header = FALSE, stringsAsFactors = FALSE,
+                      col.names = columns)
+
+# Print first 10 observation of urban_pop
+head(urban_pop, n = 10)
+```
+
+### 11. Work that Excel data!
+
+```{}
+# Add code to import data from all three sheets in urbanpop.xls
+path <- "urbanpop.xls"
+urban_sheet1 <- read.xls(path, sheet = 1, stringsAsFactors = FALSE)
+urban_sheet2 <- read.xls(path, sheet = 2, stringsAsFactors = FALSE)
+urban_sheet3 <- read.xls(path, sheet = 3, stringsAsFactors = FALSE)
+
+# Extend the cbind() call to include urban_sheet3: urban
+urban <- cbind(urban_sheet1, urban_sheet2[-1], urban_sheet3[-1])
+
+# Remove all rows with NAs from urban: urban_clean
+urban_clean <- na.omit(urban)
+
+# Print out a summary of urban_clean
+summary(urban_clean)
+```
+
+## Part 4. Reproducible Excel work with XLConnect
+
+### 1. Reading sheets
+
+```{}
+1. Reading sheets
+You already got to know two very useful packages to work with Excel data - the readxl package and the gdata package. Now imagine this situation.
+
+2. Insert title here...
+You're working in a big company that uses Excel for all there analysis work. You are forced to work on and deliver these Excel files, but you want to work on the data through R, so that you can modify the files in a reproducible way? I'm happy to tell you that there is a package that does just that:
+
+3. XLConnect
+XLConnect, written and maintained by Martin Studer. He created one of the most comprehensive packages for working with Excel files through R. You can think of XLConnect as a bridge between Excel and R. That means you can do practically any action you could do within Excel but you do it from inside R. Editing Excel sheets, formatting data and adapting entire calculation sheets, you name it. XLConnect has a function for it. XLConnect works with xls and xlsx files, and has easy-to-use functions. To get this all working so smoothly, XLConnect depends on Java. This is totally abstracted away for us end-users, but installing the package can have its difficulties.
+
+4. Installation
+If you're starting from a reasonably clean computing environment, this traditional install-dot-packages command will work fine. From the messaging, you'll see that it also installs the XLConnectJars package containing Java files and class definitions that XLConnect depends on. If it wasn't installed already, the rJava package will also be installed, providing a low-level R to Java interface that XLConnect uses. If something goes wrong during installation, it's possible that you first have to install the Java Development Kit, or JDK, from Oracle's web site. If things still don't work out, I suggest you google the errors you're getting: there's quite some people using this package so help is never far away. With our package installed and not to forget, loaded,
+
+5. loadWorkbook()
+let's take the first step: loading a workbook into R. You do this with the loadWorkbook function, by simply passing the name of the excel file you want to interface to. Assuming that our cities-dot-xlsx file is still in the current working directory, this call works. If you have a look at the structure of book, we see that it is a so-called workbook object. This object is the actual "bridge" between R and Excel I talked about earlier. After building a workbook object in R, you can use it to get information on the Excel file it links to. To get the names of the different sheets,
+
+6. getSheets()
+for example, you can use getSheets. The result is exactly the same to the excel_sheets function from readxl: a character vector containing the two sheet names. Apart from sheet information,
+
+7. readWorksheet()
+you can also read the actual data from the sheets, like readxl's read_excel function and gdata's read dot xls function. Suppose we want to import the data from the year_2000 sheet as a data frame. As the first argument to readWorksheet, we pass the workbook object, book in our case. The second argument, sheet, is the name or index of the sheet you want to import from. Works just like before. The cool thing here is, that you can easily specify from which row and which column to start reading information.
+
+8. readWorksheet()
+Say you only want the population information for Berlin and Madrid. You can simply set startRow to 3, endRow to 4 and startCol to 2. Because you skipped the first row, the column names are also skipped, so you should set header to FALSE.
+```
+
+### 2. Connect to a workbook
+
+```{}
+# urbanpop.xlsx is available in your working directory
+
+# Load the XLConnect package
+library(XLConnect)
+
+# Build connection to urbanpop.xlsx: my_book
+my_book <- loadWorkbook("urbanpop.xlsx")
+
+# Print out the class of my_book
+class(my_book)
+```
+
+### 3. List and read Excel sheets
+
+```{}
+# XLConnect is already available
+
+# Build connection to urbanpop.xlsx
+my_book <- loadWorkbook("urbanpop.xlsx")
+
+# List the sheets in my_book
+getSheets(my_book)
+
+# Import the second sheet in my_book
+readWorksheet(my_book, sheet = 2)
+```
+
+### 4. Customize readWorksheet
+
+```{}
+# XLConnect is already available
+
+# Build connection to urbanpop.xlsx
+my_book <- loadWorkbook("urbanpop.xlsx")
+
+# Import columns 3, 4, and 5 from second sheet in my_book: urbanpop_sel
+urbanpop_sel <- readWorksheet(my_book, sheet = 2, startCol = 3, endCol = 5 )
+
+# Import first column from second sheet in my_book: countries
+countries <- readWorksheet(my_book, sheet = 2, startCol = 1, endCol = 1 )
+
+# cbind() urbanpop_sel and countries together: selection
+selection <- cbind(countries, urbanpop_sel)
+ 
+```
+
+### 5. Adapting sheets
+
+```{}
+1. Adapting sheets
+Up to now, XLConnect isn't blowing your mind, is it? Just listing sheets and importing data from them into R is nothing new. But XLConnect has more to offer than just importing excel data into R. This package is an easy tool to modify the content of your workbook comfortably through R.
+
+2. New data!
+Say you managed to lay your hands om some fresh population data from 2010, that is stored in a data frame, pop_2010.
+
+3. createSheet()
+To store this info a new sheet, we start with loading XLConnect, and making a connection to the workbook. After that, we can use createSheet, and pass the workbook and the name of the new sheet, like this.
+
+4. createSheet()
+Now we can actually populate our new sheet with the data, for which we'll use
+
+5. writeWorksheet()
+writeWorksheet. The first argument, as always, is the workbook, followed by the data we want to add, so pop_2010 and finally the sheet we want to add it to. Let's use the sheet name that was specified in createSheet, but the number of the sheet, 3, would work fine as well. If you open the excel file, though, you won't see the new sheet. You'll have to explicitly save the entire workbook to a file for the changes to take effect.
+
+6. saveWorkbook()
+You do this with saveWorkbook, like this.
+
+7. saveWorkbook()
+I suggest you specify a new filename, cities2.xlsx for example, so you don't overwrite the file you started with. If you now check out the new Excel file, you see that the additional data is in there. Awesome! Suppose that after creating this additional worksheet, you don't feel comfortable with the name you chose. In fact, you want to rename all sheets. Piece of cake:
+
+8. renameSheet()
+just use the renameSheet function. As uaual, the first argument is the workbook, and then you pass the old name and the new name. We'll use this command three times, the change year with y for the three different sheets.
+
+9. renameSheet()
+Finally, we save the result again to a new file with saveWorksheet: cities3.xlsx. A quick peek at the new Excel file reveals that we successfully renamed the sheets. Perfect.
+
+10. removeSheet()
+Another Excel job would be to remove a sheet altogether. To remove the third sheet here, for example, simply use removeSheet with the workbook and the sheet name or sheet number as arguments.
+
+11. removeSheet()
+If you save the workbook to a file again and open up the file, our third sheet is gone.
+
+12. Wrap-up
+Of course these are pretty basic operations, that you can easily do in Excel as well, but the cool thing is that you can program all of these tasks in R in a reproducible way. If you update the commands that we've used here, and run them all again, one after the other, it should all still work fine. Apart from the functions I discussed here, there are also methods to style cells, getting, setting and recalculate formulas, merging and splitting up cells, the whole shebang. But let's not dive into those here and start small.
+```
+
+### 6. Add worksheet
+
+```{}
+# XLConnect is already available
+
+# Build connection to urbanpop.xlsx
+my_book <- loadWorkbook("urbanpop.xlsx")
+
+# Add a worksheet to my_book, named "data_summary"
+# createSheet(my_book, "data_summary")
+
+# Use getSheets() on my_book
+getSheets(my_book) 
+```
+
+### 7. Populate worksheet
+
+```{}
+# XLConnect is already available
+
+# Build connection to urbanpop.xlsx
+my_book <- loadWorkbook("urbanpop.xlsx")
+
+# Add a worksheet to my_book, named "data_summary"
+createSheet(my_book, "data_summary")
+
+# Create data frame: summ
+sheets <- getSheets(my_book)[1:3]
+dims <- sapply(sheets, function(x) dim(readWorksheet(my_book, sheet = x)), USE.NAMES = FALSE)
+summ <- data.frame(sheets = sheets,
+                   nrows = dims[1, ],
+                   ncols = dims[2, ])
+
+# Add data in summ to "data_summary" sheet
+writeWorksheet(my_book, summ, "data_summary")
+
+# Save workbook as summary.xlsx
+saveWorkbook(my_book, "summary.xlsx")
+```
+
+### 8. Renaming sheets
+
+```{}
+# Build connection to urbanpop.xlsx: my_book
+my_book <- loadWorkbook("urbanpop.xlsx")
+
+# Rename "data_summary" sheet to "summary"
+renameSheet(my_book, "data_summary", "summary")
+
+# Print out sheets of my_book
+getSheets(my_book)
+
+# Save workbook to "renamed.xlsx"
+saveWorkbook(my_book, file = "renamed.xlsx")
+```
+
+### 9. Removing sheets
+
+```{}
+# Load the XLConnect package
+# library(XLConnect)
+
+# Build connection to renamed.xlsx: my_book
+my_book <- loadWorkbook("renamed.xlsx")
+
+# Remove the fourth sheet
+removeSheet(my_book, sheet = 4)
+
+# Save workbook to "clean.xlsx"
+saveWorkbook(my_book, file = "clean.xlsx")
+```
