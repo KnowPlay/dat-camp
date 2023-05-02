@@ -1,9 +1,9 @@
 <!-- PROJECT SUMMARY -->
 <p align="center">
-  <h1 align="center">Learnings from DataCamp</h1>
+  <h1 align="center">Learnings from Data Analytics and Data Science </h1>
 
   <p align="center">
-    { a collection of study notes }
+    { a collection of implementations and notes }
     </br>
     ·
     <a href="https://github.com/know-playground/dat-camp/issues">» report a bug </a>
